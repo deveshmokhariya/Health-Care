@@ -64,6 +64,21 @@ async def register(
     session.add(user)
     await session.flush()  # Populate user.id before commit
 
+    if body.role.value == "doctor":
+        from app.db.models.doctor_profile import DoctorProfile
+        from datetime import time
+        default_profile = DoctorProfile(
+            user_id=user.id,
+            specialisation="General",
+            working_days=[1,2,3,4,5],
+            working_hours_start=time(9, 0),
+            working_hours_end=time(17, 0),
+            slot_duration_minutes=30
+        )
+        session.add(default_profile)
+
+    await session.commit()
+    
     _set_auth_cookies(response, str(user.id), user.role.value)
     return TokenResponse(message="Registration successful", user=UserResponse.model_validate(user))
 

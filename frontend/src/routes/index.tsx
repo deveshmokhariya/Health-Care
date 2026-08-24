@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { motion, useMotionValue, useSpring } from 'framer-motion'
 import { MagneticButton } from '../components/MagneticButton'
+import heroImg from '../assets/hero-illustration.jpg'
 
 export const Route = createFileRoute('/')({
   component: AuthPage,
@@ -121,7 +122,7 @@ function AuthPage() {
               className="absolute inset-0 bg-gradient-to-tr from-teal-900/60 to-transparent z-10"
             />
             <motion.img 
-              src="/hero-illustration.jpg" 
+              src={heroImg}
               alt="Healthcare Innovation" 
               className="w-full h-full object-cover mix-blend-overlay opacity-90"
               animate={{ scale: [1, 1.1] }}
