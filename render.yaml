@@ -1,0 +1,93 @@
+services:
+  # FastAPI Web Service
+  - type: web
+    name: healthcare-api
+    env: python
+    buildCommand: "uv pip install -e . && cd backend && uv run alembic upgrade head"
+    startCommand: "cd backend && uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: healthcare-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: healthcare-redis
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: redis
+          name: healthcare-redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          type: redis
+          name: healthcare-redis
+          property: connectionString
+      - key: APP_ENV
+        value: production
+      # Note: Add other variables (JWT, SendGrid, Anthropic, Google) manually in the Render dashboard.
+
+  # Celery Worker for Background Jobs
+  - type: worker
+    name: healthcare-worker
+    env: python
+    buildCommand: "uv pip install -e ."
+    startCommand: "cd backend && uv run celery -A app.workers.celery_app worker --loglevel=info"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: healthcare-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: healthcare-redis
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: redis
+          name: healthcare-redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          type: redis
+          name: healthcare-redis
+          property: connectionString
+
+  # Celery Beat for Scheduled Jobs
+  - type: worker
+    name: healthcare-beat
+    env: python
+    buildCommand: "uv pip install -e ."
+    startCommand: "cd backend && uv run celery -A app.workers.celery_app beat --loglevel=info"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: healthcare-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: healthcare-redis
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: redis
+          name: healthcare-redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          type: redis
+          name: healthcare-redis
+          property: connectionString
+
+databases:
+  - name: healthcare-db
+    engine: postgresql
+    plan: free
+
+  - name: healthcare-redis
+    type: redis
+    plan: free
