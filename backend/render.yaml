@@ -3,14 +3,14 @@ services:
   - type: web
     name: healthcare-frontend
     env: static
-    buildCommand: "cd frontend && npm install -g pnpm && pnpm install && pnpm run build"
+    buildCommand: "cd frontend && npm install -g pnpm && pnpm install && export VITE_API_URL=https://$VITE_API_URL && pnpm run build"
     staticPublishPath: "./frontend/dist"
     envVars:
       - key: VITE_API_URL
         fromService:
           type: web
           name: healthcare-api
-          property: url
+          property: host
       - key: NODE_VERSION
         value: "20"
     routes:
@@ -114,6 +114,7 @@ services:
   - type: redis
     name: healthcare-redis
     plan: free
+    ipAllowList: [] # Empty array allows access only from internal Render services
 
 databases:
   - name: healthcare-db
