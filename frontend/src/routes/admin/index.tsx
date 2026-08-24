@@ -54,11 +54,11 @@ function AdminDashboard() {
     const opts = { credentials: 'include' as RequestCredentials }
     try {
         const [docs, pats, appts, notifs, lvs] = await Promise.all([
-            fetch('http://localhost:8000/api/v1/admin/doctors', opts).then(r=>r.ok ? r.json() : []),
-            fetch('http://localhost:8000/api/v1/admin/patients', opts).then(r=>r.ok ? r.json() : []),
-            fetch('http://localhost:8000/api/v1/admin/appointments', opts).then(r=>r.ok ? r.json() : []),
-            fetch('http://localhost:8000/api/v1/admin/notifications', opts).then(r=>r.ok ? r.json() : []),
-            fetch('http://localhost:8000/api/v1/admin/leaves', opts).then(r=>r.ok ? r.json() : []),
+            fetch((import.meta.env.VITE_API_URL || 'http://localhost:8000') + '/api/v1/admin/doctors', opts).then(r=>r.ok ? r.json() : []),
+            fetch((import.meta.env.VITE_API_URL || 'http://localhost:8000') + '/api/v1/admin/patients', opts).then(r=>r.ok ? r.json() : []),
+            fetch((import.meta.env.VITE_API_URL || 'http://localhost:8000') + '/api/v1/admin/appointments', opts).then(r=>r.ok ? r.json() : []),
+            fetch((import.meta.env.VITE_API_URL || 'http://localhost:8000') + '/api/v1/admin/notifications', opts).then(r=>r.ok ? r.json() : []),
+            fetch((import.meta.env.VITE_API_URL || 'http://localhost:8000') + '/api/v1/admin/leaves', opts).then(r=>r.ok ? r.json() : []),
         ])
         setDoctors(Array.isArray(docs) ? docs : [])
         setPatients(Array.isArray(pats) ? pats : [])
@@ -71,7 +71,7 @@ function AdminDashboard() {
   const handleDeleteDoctor = async (id: string) => {
     if(!confirm('Are you sure you want to permanently delete this doctor? This will delete all their appointments.')) return;
     try {
-        await fetch(`http://localhost:8000/api/v1/admin/doctors/${id}?hard_delete=true`, { method: 'DELETE', credentials: 'include' })
+        await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.VITE_API_URL || 'http://localhost:8000') + ''}/api/v1/admin/doctors/${id}?hard_delete=true`, { method: 'DELETE', credentials: 'include' })
         fetchData()
     } catch(e: any) { alert(e.message) }
   }
@@ -79,14 +79,14 @@ function AdminDashboard() {
   const handleDeletePatient = async (id: string) => {
       if(!confirm('Are you sure you want to permanently delete this patient? This will delete all their appointments.')) return;
       try {
-          await fetch(`http://localhost:8000/api/v1/admin/patients/${id}?hard_delete=true`, { method: 'DELETE', credentials: 'include' })
+          await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.VITE_API_URL || 'http://localhost:8000') + ''}/api/v1/admin/patients/${id}?hard_delete=true`, { method: 'DELETE', credentials: 'include' })
           fetchData()
       } catch(e: any) { alert(e.message) }
   }
 
   const handleTogglePatientStatus = async (pat: any) => {
       try {
-          await fetch(`http://localhost:8000/api/v1/admin/patients/${pat.id}/status`, { 
+          await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.VITE_API_URL || 'http://localhost:8000') + ''}/api/v1/admin/patients/${pat.id}/status`, { 
               method: 'PUT', headers: {'Content-Type': 'application/json'}, credentials: 'include',
               body: JSON.stringify({ is_active: !pat.is_active })
           })
@@ -97,7 +97,7 @@ function AdminDashboard() {
   const handleUpdateDoctor = async (e: any) => {
       e.preventDefault()
       try {
-          await fetch(`http://localhost:8000/api/v1/admin/doctors/${editDoc.id}`, {
+          await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.VITE_API_URL || 'http://localhost:8000') + ''}/api/v1/admin/doctors/${editDoc.id}`, {
               method: 'PUT', headers: {'Content-Type': 'application/json'}, credentials: 'include',
               body: JSON.stringify(editDoc)
           })
@@ -109,7 +109,7 @@ function AdminDashboard() {
   const handleUpdatePatient = async (e: any) => {
       e.preventDefault()
       try {
-          await fetch(`http://localhost:8000/api/v1/admin/patients/${editPat.id}`, {
+          await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.VITE_API_URL || 'http://localhost:8000') + ''}/api/v1/admin/patients/${editPat.id}`, {
               method: 'PUT', headers: {'Content-Type': 'application/json'}, credentials: 'include',
               body: JSON.stringify(editPat)
           })
@@ -121,7 +121,7 @@ function AdminDashboard() {
   const handleMarkLeave = async (e: any) => {
       e.preventDefault()
       try {
-          await fetch(`http://localhost:8000/api/v1/admin/doctors/${leaveDoc.id}/leave`, {
+          await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.VITE_API_URL || 'http://localhost:8000') + ''}/api/v1/admin/doctors/${leaveDoc.id}/leave`, {
               method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include',
               body: JSON.stringify({ leave_date: leaveDate })
           })
@@ -133,7 +133,7 @@ function AdminDashboard() {
   const handleCancelAppointment = async (id: string) => {
       if(!confirm('Cancel this appointment?')) return;
       try {
-          await fetch(`http://localhost:8000/api/v1/admin/appointments/${id}/cancel`, { method: 'POST', credentials: 'include' })
+          await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.VITE_API_URL || 'http://localhost:8000') + ''}/api/v1/admin/appointments/${id}/cancel`, { method: 'POST', credentials: 'include' })
           fetchData()
       } catch(e: any) { alert(e.message) }
   }
@@ -141,7 +141,7 @@ function AdminDashboard() {
   const handleRetryNotification = async (id: string) => {
       setIsRetrying(id)
       try {
-          await fetch(`http://localhost:8000/api/v1/admin/notifications/${id}/retry`, { method: 'POST', credentials: 'include' })
+          await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.VITE_API_URL || 'http://localhost:8000') + ''}/api/v1/admin/notifications/${id}/retry`, { method: 'POST', credentials: 'include' })
           await fetchData()
       } catch(e: any) { alert(e.message) }
       finally { setIsRetrying(null) }

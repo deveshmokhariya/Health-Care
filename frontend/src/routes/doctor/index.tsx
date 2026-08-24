@@ -50,7 +50,7 @@ function DoctorDashboard() {
 
   const fetchAppointments = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/v1/doctor/appointments/today', { credentials: 'include' })
+      const res = await fetch((import.meta.env.VITE_API_URL || 'http://localhost:8000') + '/api/v1/doctor/appointments/today', { credentials: 'include' })
       if (!res.ok) throw new Error('Failed to fetch')
       const data = await res.json()
       setAppointments(data)
@@ -61,7 +61,7 @@ function DoctorDashboard() {
 
   const fetchProfile = async () => {
       try {
-          const res = await fetch('http://localhost:8000/api/v1/doctor/profile', { credentials: 'include' })
+          const res = await fetch((import.meta.env.VITE_API_URL || 'http://localhost:8000') + '/api/v1/doctor/profile', { credentials: 'include' })
           if(res.ok) setProfile(await res.json())
       } catch(e) {}
   }
@@ -69,7 +69,7 @@ function DoctorDashboard() {
   const handleUpdateProfile = async (e: any) => {
       e.preventDefault()
       try {
-          const res = await fetch('http://localhost:8000/api/v1/doctor/profile', {
+          const res = await fetch((import.meta.env.VITE_API_URL || 'http://localhost:8000') + '/api/v1/doctor/profile', {
               method: 'PUT',
               headers: {'Content-Type': 'application/json'},
               credentials: 'include',

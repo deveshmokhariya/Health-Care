@@ -43,7 +43,7 @@ function VisitCompletion() {
   ]
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/v1/doctor/appointments/${appointmentId}`, { credentials: 'include' })
+    fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.VITE_API_URL || 'http://localhost:8000') + ''}/api/v1/doctor/appointments/${appointmentId}`, { credentials: 'include' })
       .then(res => res.json())
       .then(data => setAppointment(data))
       .catch(console.error)
@@ -66,7 +66,7 @@ function VisitCompletion() {
     const rawNotes = `Notes: ${notes}\nDiagnosis: ${diagnosis}\nPrescriptions: ${prescriptions}\nFollow-up: ${followUp}`
     
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/doctor/appointments/${appointmentId}/complete`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.VITE_API_URL || 'http://localhost:8000') + ''}/api/v1/doctor/appointments/${appointmentId}/complete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

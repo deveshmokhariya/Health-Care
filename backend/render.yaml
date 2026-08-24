@@ -1,10 +1,28 @@
 services:
+  # Vite React Frontend
+  - type: web
+    name: healthcare-frontend
+    env: static
+    buildCommand: "cd frontend && npm install -g pnpm && pnpm install && pnpm run build"
+    staticPublishPath: "./frontend/dist"
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: healthcare-api
+          property: url
+      - key: NODE_VERSION
+        value: "20"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
   # FastAPI Web Service
   - type: web
     name: healthcare-api
     env: python
-    buildCommand: "uv pip install -e . && cd backend && uv run alembic upgrade head"
-    startCommand: "cd backend && uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    buildCommand: "cd backend && pip install -e . && alembic upgrade head"
+    startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -27,14 +45,19 @@ services:
           property: connectionString
       - key: APP_ENV
         value: production
-      # Note: Add other variables (JWT, SendGrid, Anthropic, Google) manually in the Render dashboard.
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: APP_SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
 
   # Celery Worker for Background Jobs
   - type: worker
     name: healthcare-worker
     env: python
-    buildCommand: "uv pip install -e ."
-    startCommand: "cd backend && uv run celery -A app.workers.celery_app worker --loglevel=info"
+    buildCommand: "cd backend && pip install -e ."
+    startCommand: "cd backend && celery -A app.workers.celery_app worker --loglevel=info"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -55,13 +78,15 @@ services:
           type: redis
           name: healthcare-redis
           property: connectionString
+      - key: PYTHON_VERSION
+        value: "3.12.0"
 
   # Celery Beat for Scheduled Jobs
   - type: worker
     name: healthcare-beat
     env: python
-    buildCommand: "uv pip install -e ."
-    startCommand: "cd backend && uv run celery -A app.workers.celery_app beat --loglevel=info"
+    buildCommand: "cd backend && pip install -e ."
+    startCommand: "cd backend && celery -A app.workers.celery_app beat --loglevel=info"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -82,12 +107,14 @@ services:
           type: redis
           name: healthcare-redis
           property: connectionString
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+
+  # Redis Service
+  - type: redis
+    name: healthcare-redis
+    plan: free
 
 databases:
   - name: healthcare-db
-    engine: postgresql
-    plan: free
-
-  - name: healthcare-redis
-    type: redis
     plan: free

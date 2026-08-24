@@ -101,13 +101,13 @@ function PatientPortal() {
   }, [bookingStep, loadingMessages.length])
 
   const fetchDoctors = async () => {
-    const data = await fetch('http://localhost:8000/api/v1/patient/doctors', { credentials: 'include' }).then(r => r.json())
+    const data = await fetch((import.meta.env.VITE_API_URL || 'http://localhost:8000') + '/api/v1/patient/doctors', { credentials: 'include' }).then(r => r.json())
     if(Array.isArray(data)) setDoctors(data)
   }
 
     const fetchAppointments = async () => {
         try {
-            const res = await fetch(`http://localhost:8000/api/v1/patient/appointments?t=${Date.now()}`, { 
+            const res = await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.VITE_API_URL || 'http://localhost:8000') + ''}/api/v1/patient/appointments?t=${Date.now()}`, { 
                 credentials: 'include',
                 headers: {
                     'Cache-Control': 'no-cache',
@@ -132,7 +132,7 @@ function PatientPortal() {
   const handleSelectDoctor = async (doctorId: string) => {
     setSelectedDoctor(doctorId)
     try {
-      const data = await fetch(`http://localhost:8000/api/v1/patient/doctors/${doctorId}/slots?target_date=${targetDate}`, { credentials: 'include' }).then(r => r.json())
+      const data = await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.VITE_API_URL || 'http://localhost:8000') + ''}/api/v1/patient/doctors/${doctorId}/slots?target_date=${targetDate}`, { credentials: 'include' }).then(r => r.json())
       // The API returns an array of DoctorSearchResponse. We extract available_slots from the first item.
       if (Array.isArray(data) && data.length > 0) {
         setSlots(data[0].available_slots || [])
@@ -148,7 +148,7 @@ function PatientPortal() {
   const handleHoldSlot = async (slotStart: string) => {
     if(!selectedDoctor) return;
     try {
-        const res = await fetch('http://localhost:8000/api/v1/patient/appointments/hold', {
+        const res = await fetch((import.meta.env.VITE_API_URL || 'http://localhost:8000') + '/api/v1/patient/appointments/hold', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -167,7 +167,7 @@ function PatientPortal() {
     if(!heldAppointment) return;
     setBookingStep(2) // trigger skeleton loader
     try {
-        const res = await fetch(`http://localhost:8000/api/v1/patient/appointments/${heldAppointment.appointment_id}/confirm`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.VITE_API_URL || 'http://localhost:8000') + ''}/api/v1/patient/appointments/${heldAppointment.appointment_id}/confirm`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -250,7 +250,7 @@ function PatientPortal() {
                           setTargetDate(newDate);
                           if (selectedDoctor) {
                             // Re-fetch slots for the new date without clearing doctor selection
-                            fetch(`http://localhost:8000/api/v1/patient/doctors/${selectedDoctor}/slots?target_date=${newDate}`, { credentials: 'include' })
+                            fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.VITE_API_URL || 'http://localhost:8000') + ''}/api/v1/patient/doctors/${selectedDoctor}/slots?target_date=${newDate}`, { credentials: 'include' })
                               .then(r => r.json())
                               .then(data => {
                                 if (Array.isArray(data) && data.length > 0) setSlots(data[0].available_slots || [])

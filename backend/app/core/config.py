@@ -19,6 +19,16 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str
 
+    @property
+    def get_database_url(self) -> str:
+        # Render provides postgres:// but asyncpg needs postgresql+asyncpg://
+        url = self.DATABASE_URL
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return url
+
     # JWT
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
